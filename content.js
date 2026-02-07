@@ -15,26 +15,28 @@ chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'm
     const hasAuth = (mode === 'aistudio' && result.geminiApiKey) || (mode === 'vertex' && result.projectId);
 
     if (hasAuth && !isProcessing) {
-        initLiveTeacher({
-            apiKey: result.geminiApiKey,
-            apiMode: mode,
-            projectId: result.projectId,
-            location: result.location,
-            // Default to Gemini 1.5 Flash (Stable & Fast)
-            modelId: result.modelId || 'gemini-1.5-flash',
-            targetLang: result.targetLang || 'Spanish',
-            density: result.density || 20
-        });
+        setTimeout(() => {
+            initLiveTeacher({
+                apiKey: result.geminiApiKey,
+                apiMode: mode,
+                projectId: result.projectId,
+                location: result.location,
+                modelId: 'gemini-2.5-flash-preview-09-2025',
+                targetLang: result.targetLang || 'Japanese',
+                density: result.density || 20
+            });
+        }, 3000); // Wait 3s for page to settle
     }
 });
 
 // Live Teacher State
 let lastScrollY = 0;
 let isRequestPending = false;
+let lastRequestTime = 0; // Throttle timestamp
 let processedNodes = new Set(); // Keep track of nodes we've already seemingly processed
 
 function initLiveTeacher(config) {
-    console.log("LingoGhost: Live Teacher is awake 👨‍🏫");
+    console.log("LingoGhost: Live Teacher is awake 👨‍🏫 (Throttled Mode)");
 
     // Initial lesson (scan top of page)
     processViewport(config);
@@ -42,7 +44,7 @@ function initLiveTeacher(config) {
     // Watch for movement
     setInterval(() => {
         checkScroll(config);
-    }, 3000); // Check every 3s
+    }, 6000); // Check every 6s (was 3s)
 }
 
 function checkScroll(config) {
@@ -59,7 +61,16 @@ function checkScroll(config) {
 
 function processViewport(config) {
     if (isRequestPending) return;
+
+    // Throttle: Enforce 20s cooldown between requests
+    const now = Date.now();
+    if (now - lastRequestTime < 20000) {
+        console.log("LingoGhost: Throttling request... waiting for cooldown.");
+        return;
+    }
+
     isRequestPending = true;
+    lastRequestTime = now;
 
     // Collect Visible Text
     const walker = document.createTreeWalker(
@@ -251,6 +262,11 @@ function showQuizPopup(targetElement) {
 
     const contextWord = targetElement.textContent;
     const correctAnswer = targetElement.dataset.original;
+
+    if (!correctAnswer) {
+        console.warn("LingoGhost: Missing original word data for quiz.");
+        return;
+    }
 
     // Clean up correct answer for comparison
     const cleanCorrect = correctAnswer.replace(/^[^\w]+|[^\w]+$/g, '');

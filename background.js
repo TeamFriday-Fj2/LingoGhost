@@ -1,3 +1,6 @@
+// Configuration: Single Source of Truth for Default Model
+const DEFAULT_MODEL = 'gemini-2.5-flash-preview-09-2025';
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "translate") {
         console.log("LingoGhost Background: Received translate request", request);
@@ -49,6 +52,9 @@ async function handleTranslation(text, targetLang, density, config) {
     let apiUrl = '';
     let token = '';
 
+    // Use the provided model, or fallback to the hardcoded default
+    const currentModel = modelId || DEFAULT_MODEL;
+
     // NEW: Get failed words (Memory)
     let failedWords = [];
     try {
@@ -60,7 +66,7 @@ async function handleTranslation(text, targetLang, density, config) {
     }
 
 
-    console.log(`LingoGhost Background: Processing with Mode=${apiMode}, Model=${modelId}`);
+    console.log(`LingoGhost Background: Processing with Mode=${apiMode}, Model=${currentModel}`);
 
     // Choose API Mode
     if (apiMode === 'vertex') {
@@ -85,14 +91,12 @@ async function handleTranslation(text, targetLang, density, config) {
             throw new Error("OAuth2 Error. Ensure `oauth2` client_id in manifest.json is correct. " + e.message);
         }
 
-        const model = modelId || 'gemini-1.5-flash';
-        apiUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+        apiUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${currentModel}:generateContent`;
 
     } else {
         // Default: AI Studio
-        const model = modelId || 'gemini-1.5-flash';
         if (!apiKey) throw new Error("Missing API Key for Google AI Studio.");
-        apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
     }
 
     // limit text length
