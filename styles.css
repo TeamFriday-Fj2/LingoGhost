@@ -1,13 +1,125 @@
-.langswitch-word {
-    background-color: #e8f0fe;
-    color: #1967d2;
-    border-bottom: 2px solid #aecbfa;
+/* 单词样式 (保持不变) */
+.lingo-ghost {
+    background-color: #f3e5f5;
+    color: #4a148c;
+    border-bottom: 2px solid #ce93d8;
+    border-radius: 4px;
+    padding: 0 4px;
+    margin: 0 2px;
     cursor: help;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     font-weight: 500;
+    display: inline-block;
 }
 
-.langswitch-word:hover {
-    background-color: #d2e3fc;
-    color: #174ea6;
+.lingo-ghost:hover {
+    background-color: #e1bee7;
+    border-color: #ba68c8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.lingo-solved {
+    background: transparent !important;
+    color: inherit !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: text !important;
+    font-weight: inherit !important;
+    transition: none !important;
+}
+
+/* 极简横向弹窗 */
+.lingo-quiz-popup {
+    position: absolute;
+    z-index: 2147483647 !important;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+
+    /* 横向布局 */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* 间距 */
+
+    padding: 6px 10px;
+    white-space: nowrap;
+    /* 不换行 */
+
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 20px !important;
+    /* 胶囊状圆角 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+    pointer-events: auto;
+    animation: popIn 0.1s ease-out;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 原词样式：加粗，显眼 */
+.lingo-origin-text {
+    font-weight: 700;
+    color: #333;
+    font-size: 14px;
+    margin-right: 4px;
+    /* 与选项隔开 */
+}
+
+/* 选项按钮样式 */
+.lingo-opt-btn {
+    padding: 4px 10px;
+    /* 小巧按钮 */
+    border: 1px solid #eee;
+    background: #fdfdfd;
+    border-radius: 12px;
+    /* 圆润 */
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+    transition: all 0.1s;
+}
+
+.lingo-opt-btn:hover {
+    background-color: #f3e5f5;
+    border-color: #d1c4e9;
+    color: #4a148c;
+    transform: translateY(-1px);
+}
+
+/* 小幽灵动画 */
+.ghost-anim-element {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2147483647;
+    font-size: 28px;
+    animation: floatUpFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes floatUpFade {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(0.8);
+        opacity: 0;
+    }
+
+    20% {
+        transform: translateY(-20px) rotate(-10deg) scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-80px) rotate(10deg) scale(0.5);
+        opacity: 0;
+    }
 }

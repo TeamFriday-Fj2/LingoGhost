@@ -109,7 +109,7 @@ async function handleTranslation(text, targetLang, density, config) {
 
     // Live Teacher Mode: frequent, small requests.
     // We only want 1 or 2 words per "lesson" to avoid overwhelming the user and saving tokens.
-    const maxWords = 2;
+    const maxWords = 5;
 
     const prompt = `
     You are a language learning assistant.
@@ -119,10 +119,11 @@ async function handleTranslation(text, targetLang, density, config) {
     1. Select simple, common words suitable for learning.
     2. Provide the translation that fits the CONTEXT.
     3. Do NOT translate proper names or specialized technical terms.
-    4. For each word, provide 3 distinctive INCORRECT options (distractors) in the ORIGINAL LANGUAGE (Same language as the "original" field). 
-       - e.g. If Original="Cat", Translated="Gato", Alternatives=["Dog", "Mouse", "Bird"].
+    4. For each word, provide 2 DISTINCTIVE INCORRECT options (distractors) in the TRANSLATED LANGUAGE (${targetLang}).
+       - e.g. If Original="Cat", Translated="Gato" (Spanish), Alternatives MUST be other Spanish words like ["Perro", "Pajaro"].
+       - Do NOT provide English/Original Language distractors.
     5. Output MUST be valid JSON.
-    6. Format: { "replacements": [ { "original": "word", "translated": "traducción", "alternatives": ["incorrect1", "incorrect2", "incorrect3"] }, ... ] }
+    6. Format: { "replacements": [ { "original": "word", "translated": "traducción", "alternatives": ["incorrect_in_target_lang1", "incorrect_in_target_lang2"] }, ... ] }
     ${priorityInstruction}
     8. Return ONLY the JSON object, no markdown formatting.
     
