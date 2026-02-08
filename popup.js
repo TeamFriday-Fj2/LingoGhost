@@ -12,6 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const densityValue = document.getElementById('densityValue');
     const saveBtn = document.getElementById('saveBtn');
     const statusDiv = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const engineStatusDiv = document.getElementById('engineStatus');
+
+    function updateEngineUI(isEnabled) {
+        if (isEnabled) {
+            engineStatusDiv.textContent = 'Status: RUNNING';
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.5';
+            stopBtn.disabled = false;
+            stopBtn.style.opacity = '1';
+        } else {
+            engineStatusDiv.textContent = 'Status: STOPPED';
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            stopBtn.disabled = true;
+            stopBtn.style.opacity = '0.5';
+        }
+    }
 
     // Toggle Config Visibility
     apiModeSelect.addEventListener('change', () => {
@@ -25,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load saved settings
-    chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'modelId', 'targetLang', 'density'], (result) => {
+    chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'modelId', 'targetLang', 'density', 'engineEnabled'], (result) => {
+        const isEnabled = result.engineEnabled !== false; // Default to true if not set
+        updateEngineUI(isEnabled);
+
         if (result.geminiApiKey) apiKeyInput.value = result.geminiApiKey;
         if (result.apiMode) {
             apiModeSelect.value = result.apiMode;
@@ -42,6 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
             densityValue.textContent = result.density;
         }
     });
+
+    // Start/Stop Logic
+    const toggleEngine = (enable) => {
+        chrome.storage.local.set({ engineEnabled: enable }, () => {
+            updateEngineUI(enable);
+            // Notify content script
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0]) {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        action: enable ? "startEngine" : "stopEngine"
+                    });
+                }
+            });
+        });
+    };
+
+    startBtn.addEventListener('click', () => toggleEngine(true));
+    stopBtn.addEventListener('click', () => toggleEngine(false));
 
     // Update density label on change
     densityInput.addEventListener('input', () => {

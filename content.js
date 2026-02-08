@@ -1,18 +1,12 @@
 let isProcessing = false;
 
-// Listen for messages from popup (e.g. settings changed)
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "updateSettings") {
-        console.log("Settings updated");
-    }
-});
-
 // Auto-run on load
-chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'modelId', 'targetLang', 'density'], (result) => {
+chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'modelId', 'targetLang', 'density', 'engineEnabled'], (result) => {
     const mode = result.apiMode || 'aistudio';
     const hasAuth = (mode === 'aistudio' && result.geminiApiKey) || (mode === 'vertex' && result.projectId);
+    const isEnabled = result.engineEnabled !== false;
 
-    if (hasAuth && !isProcessing) {
+    if (hasAuth && isEnabled && !isProcessing) {
         initLiveTeacher({
             apiKey: result.geminiApiKey,
             apiMode: mode,
@@ -22,6 +16,27 @@ chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'm
             targetLang: result.targetLang || 'Japanese',
             density: result.density || 20
         });
+    }
+});
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "startEngine") {
+        console.log("LingoGhost: Starting engine...");
+        chrome.storage.local.get(['geminiApiKey', 'apiMode', 'projectId', 'location', 'modelId', 'targetLang', 'density'], (result) => {
+            initLiveTeacher({
+                apiKey: result.geminiApiKey,
+                apiMode: result.apiMode || 'aistudio',
+                projectId: result.projectId,
+                location: result.location,
+                modelId: result.modelId || 'gemini-2.5-flash-preview-09-2025',
+                targetLang: result.targetLang || 'Japanese',
+                density: result.density || 20
+            });
+        });
+    } else if (request.action === "stopEngine") {
+        console.log("LingoGhost: Stopping engine...");
+        stopLiveTeacher();
     }
 });
 
@@ -58,9 +73,26 @@ function initLiveTeacher(config) {
     });
 
     // 3. Watch for scroll movement
-    setInterval(() => {
+    if (window.lingoScrollInterval) clearInterval(window.lingoScrollInterval);
+    window.lingoScrollInterval = setInterval(() => {
         checkScroll(config);
     }, 6000);
+}
+
+function stopLiveTeacher() {
+    console.log("LingoGhost: Engine stopped 💤");
+    if (observer) {
+        observer.disconnect();
+        observer = null;
+    }
+    if (observerTimeout) {
+        clearTimeout(observerTimeout);
+        observerTimeout = null;
+    }
+    if (window.lingoScrollInterval) {
+        clearInterval(window.lingoScrollInterval);
+        window.lingoScrollInterval = null;
+    }
 }
 
 function checkScroll(config) {

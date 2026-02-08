@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
   <title>LingoGhost Settings</title>
   <style>
     body {
@@ -97,6 +98,16 @@
 
 <body>
   <h1>LingoGhost 👻</h1>
+
+  <div class="control-group">
+    <label>Engine Status</label>
+    <div style="display: flex; gap: 10px;">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn">Stop</button>
+    </div>
+    <div id="engineStatus" class="note" style="text-align: center; margin-top: 5px; font-weight: bold;">Status:
+      Checking...</div>
+  </div>
 
   <div class="control-group">
     <label for="apiMode">API Mode</label>
