@@ -7,19 +7,13 @@ LingoGhost is more than just a translation extension; it's a mischievous AI tuto
 ---
 
 ##  How to Install (Quick Start)
-To experience LingoGhost in 1 minute, follow these steps:
-
-Download: Get the LingoGhost_v1.0.0_Sub.zip from our Releases.
-
-Unzip: Extract the ZIP file to a folder on your computer.
-
-Chrome Extension Page: Open Chrome and type chrome://extensions/ in the address bar.
-
-Developer Mode: Switch on the "Developer mode" toggle in the top right corner.
-
-Load Unpacked: Click the "Load unpacked" button and select the folder you just unzipped.
-
-Setup: Click the Ghost icon 👻 in your extension bar, enter your Gemini API Key, and click Start!
+1.  **To experience LingoGhost in 1 minute, follow these steps:
+2.  **Download: Get the LingoGhost_v1.0.0_Sub.zip from our Releases.
+3.  **Unzip: Extract the ZIP file to a folder on your computer.
+4.  **Chrome Extension Page: Open Chrome and type chrome://extensions/ in the address bar.
+5.  **Developer Mode: Switch on the "Developer mode" toggle in the top right corner.
+6.  **Load Unpacked: Click the "Load unpacked" button and select the folder you just unzipped.
+7.  **Setup: Click the Ghost icon 👻 in your extension bar, enter your Gemini API Key, and click Start!
 
 ---
 
